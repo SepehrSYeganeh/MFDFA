@@ -1,11 +1,11 @@
 import numpy as np
-from numpy.typing import NDArray
-from typing import Tuple
 
 
-def mfdfa(timeseries: NDArray,
+def mfdfa(timeseries: np.ndarray,
           order: int = 1,
-          q_arr: NDArray = 2) -> Tuple[NDArray, NDArray, NDArray]:
+          q_arr: np.ndarray = 2
+          ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:  # segment sizes, fluctuation, frac order
+
     # Assert if timeseries is 1 dimensional
     if timeseries.ndim > 1:
         assert timeseries.shape[1] == 1, "Timeseries needs to be 1 dimensional"
