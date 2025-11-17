@@ -27,7 +27,7 @@ def MFDFAm(timeseries: np.ndarray,
 
     # segment size as powers of 2
     max_pow = int(np.log2(N)) - 2
-    min_pow = int(np.log2(poly_order + 2)) + 1
+    min_pow = int(np.log2(poly_order + 2)) + 3  # TODO: is this correct?
     segment_sizes = np.logspace(min_pow, max_pow, max_pow - min_pow + 1, base=2, dtype=int)
 
     # detrended profile
@@ -38,17 +38,22 @@ def MFDFAm(timeseries: np.ndarray,
 
     # iterate over window sizes
     for s, size in enumerate(segment_sizes):
-        # number of segments of size s
-        N_s = int(N / size)
+        # number of segments
+        N_s = N // size
 
         # reshape Y to segments
-        segments = np.vstack((Y[N % size:].reshape(N_s, size), Y[:-(N % size)].reshape(N_s, size)))
+        if N % size == 0:
+            segments = Y.reshape(N_s, size)
+        else:
+            segments = np.vstack((Y[N % size:].reshape(N_s, size), Y[:-(N % size)].reshape(N_s, size)))
 
         # X values at each segment
         X = np.arange(size)
 
         # detrended value at each segment f(nu, s)
         detrended = np.zeros(segments.shape[0])
+
+        print(N_s, segments.shape[0])
 
         # iterate over segments and calculate detrended values
         for nu, segment in enumerate(segments):
@@ -58,31 +63,12 @@ def MFDFAm(timeseries: np.ndarray,
         # F(s, q)
         for i, q in enumerate(q_arr):
             if q > 0:
-                F[s, i] = np.power(np.mean(np.power(detrended, q)), 1 / q)
+                F[s, i] = np.power(np.mean(np.power(detrended, q / 2)), 1 / q)
             else:
                 mask = detrended != 0
-                F[s, i] = np.power(np.mean(np.power(detrended[mask], q)), 1 / q)
+                F[s, i] = np.power(np.mean(np.power(detrended[mask], q / 2)), 1 / q)
 
     return segment_sizes, F.transpose(), q_arr
-
-
-def structure_function(xi: np.ndarray, q_arr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    # TODO: complete
-    # size of time series
-    T = xi.size
-
-    # list of lag
-    min_pow = 0
-    max_pow = np.log2(T).astype(int) - 1
-    tau_arr = np.logspace(min_pow, max_pow, max_pow - min_pow + 1, base=2, dtype=int)
-
-    # structure function
-    S = np.array([
-        [np.mean(np.power(np.fabs(xi[tau:] - xi[:-tau]), q)) for tau in tau_arr]
-        for q in q_arr
-    ])
-
-    return tau_arr, S
 
 
 def generalised_Hurst_exponent(x: np.ndarray, y: np.ndarray) -> float:
@@ -113,4 +99,21 @@ def singularity_spectrum(alpha_q: np.ndarray, tau_q: np.ndarray, frac_ord: np.nd
     return np.array([frac_ord[q] * alpha_q[q] - tau_q[q]
                      for q in range(alpha_q.size)])
 
-# TODO: white noise
+
+def structure_function(xi: np.ndarray, q_arr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    # TODO: complete
+    # size of time series
+    T = xi.size
+
+    # list of lag
+    min_pow = 0
+    max_pow = np.log2(T).astype(int) - 1
+    tau_arr = np.logspace(min_pow, max_pow, max_pow - min_pow + 1, base=2, dtype=int)
+
+    # structure function
+    S = np.array([
+        [np.mean(np.power(np.fabs(xi[tau:] - xi[:-tau]), q)) for tau in tau_arr]
+        for q in q_arr
+    ])
+
+    return tau_arr, S
