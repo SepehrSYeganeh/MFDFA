@@ -1,10 +1,10 @@
 import numpy as np
 
 
-def mfdfa(timeseries: np.ndarray,
-          order: int = 1,
-          q_arr: np.ndarray = 2
-          ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:  # segment sizes, fluctuation, frac order
+def MFDFAm(timeseries: np.ndarray,
+           order: int = 1,
+           q_arr: np.ndarray = 2
+           ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:  # segment sizes, fluctuation, frac order
 
     # Assert if timeseries is 1 dimensional
     if timeseries.ndim > 1:
@@ -17,7 +17,7 @@ def mfdfa(timeseries: np.ndarray,
     q_arr = q_arr[(q_arr < -.1) + (q_arr > .1)]
 
     # Size of array
-    N = timeseries.shape[0]
+    N = timeseries.size
 
     # Window size as powers of 2
     max_pow = int(np.log2(N)) - 2

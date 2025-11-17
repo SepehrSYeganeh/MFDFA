@@ -1,5 +1,5 @@
-from MFDFA import *
-from MFDFA.mfdfa import *
+from mfda import *
+from mfda.mfdfa import *
 
 
 def main():
