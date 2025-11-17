@@ -53,8 +53,6 @@ def MFDFAm(timeseries: np.ndarray,
         # detrended value at each segment f(nu, s)
         detrended = np.zeros(segments.shape[0])
 
-        print(N_s, segments.shape[0])
-
         # iterate over segments and calculate detrended values
         for nu, segment in enumerate(segments):
             y = np.polyval(np.polyfit(X, segment, poly_order), X)  # polynomial fit to each segment

@@ -65,7 +65,7 @@ def fgn(N: int, H: float) -> np.ndarray:
     return f
 
 
-def generate_fgn_noise(H: float, theta: float, sigma: float) -> np.ndarray:
+def fractional_gaussian_noise(H: float, theta: float, sigma: float) -> np.ndarray:
     t_final = 10000
     dt = 0.001
     N = int(t_final / dt)
@@ -74,3 +74,8 @@ def generate_fgn_noise(H: float, theta: float, sigma: float) -> np.ndarray:
     for i in range(1, N):
         X[i] = X[i - 1] - theta * X[i - 1] * dt + sigma * dB[i - 1]
     return X
+
+
+def random_walk(N: int, step_size: float = 1) -> np.ndarray:
+    steps = step_size * np.random.choice([-1, 1], size=N)
+    return np.cumsum(steps)
